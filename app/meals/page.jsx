@@ -1,37 +1,37 @@
-import Image from "next/image";
+import Link from "next/link";
 import classes from "./page.module.css";
-import { getMeal } from "@/lib/meals";
-import { notFound } from "next/navigation";
+import MealsGrid from "@/components/meals/meals-grid.module";
+import { getMeals } from "@/lib/meals";
+import { Suspense } from "react";
 
-export default function MealDetailPage({ params }) {
-  const meal = getMeal(params.mealSlug);
+async function Meals() {
+  const meals = await getMeals();
 
-  if (!meal) {
-    notFound();
-  }
-  
+  return <MealsGrid meals={meals} />;
+}
 
+export default function MealsPage() {
   return (
     <>
       <header className={classes.header}>
-        <div className={classes.image}>
-          <Image src={meal.image} fill />
-        </div>
-        <div className={classes.headerText}>
-          <h1>{meal.title}</h1>
-          <p className={classes.creator}>
-            by <a href="">{meal.creator}</a>
-          </p>
-          <p className={classes.summary}>{meal.summary}</p>
-          <p
-            className={classes.instructions}
-            dangerouslySetInnerHTML={{
-              __html: meal.instructions,
-            }}
-          ></p>
-        </div>
+        <h1>
+          Delicious meals, created{" "}
+          <span className={classes.highlight}>by you</span>
+        </h1>
+        <p>
+          Choose your favorite recipe and cook it yourself. It is easy and fun!
+        </p>
+        <p className={classes.cta}>
+          <Link href="/meals/share">Share Your Favorite Recipe</Link>
+        </p>
       </header>
-      <main></main>
+      <main className={classes.main}>
+        <Suspense
+          fallback={<p className={classes.loading}>Getting meals...</p>}
+        >
+          <Meals />
+        </Suspense>
+      </main>
     </>
   );
 }
